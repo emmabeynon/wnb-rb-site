@@ -8,6 +8,7 @@ ruby '~> 3.0'
 gem 'devise'
 
 gem 'jbuilder', '~> 2.7'
+gem 'pagy'
 gem 'pg'
 gem 'puma', '~> 5.6'
 gem 'rails', '~> 7.0'
