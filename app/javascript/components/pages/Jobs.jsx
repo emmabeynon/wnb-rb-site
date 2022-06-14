@@ -13,7 +13,7 @@ import { UnauthorizedError } from '../../errors';
 import 'stylesheets/page';
 import 'stylesheets/jobs';
 
-const Jobs = () => {
+const Jobs = ({ pageNumber }) => {
     const [loading, setLoading] = useState(true);
     const [jobs, setJobs] = useState([]);
     const [cookies] = useCookies();
@@ -21,7 +21,7 @@ const Jobs = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await getJobs(cookies['wnb_job_board_token']);
+                const data = await getJobs(cookies['wnb_job_board_token'], pageNumber);
                 setJobs(data);
                 setLoading(false);
             } catch (error) {
@@ -35,7 +35,7 @@ const Jobs = () => {
         };
 
         fetchData();
-    }, [cookies]);
+    }, [cookies, pageNumber]);
 
     const [firstSixJobs, restOfJobs] = useMemo(() => {
         if (jobs === []) {
@@ -62,6 +62,10 @@ const Jobs = () => {
             )}
         </SharedLayout>
     );
+};
+
+Jobs.propTypes = {
+    pageNumber: propTypes.string,
 };
 
 const JobGroup = ({ jobs }) => {

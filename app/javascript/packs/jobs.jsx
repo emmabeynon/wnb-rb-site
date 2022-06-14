@@ -6,5 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const body = document.createElement('div');
     body.style = 'min-height: 100vh';
 
-    ReactDOM.render(<Jobs />, document.body.appendChild(body));
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const pageNumber = urlParams.get('page');
+
+    ReactDOM.render(<Jobs pageNumber={pageNumber} />, document.body.appendChild(body));
 });
