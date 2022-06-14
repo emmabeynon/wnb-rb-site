@@ -63,6 +63,39 @@ RSpec.describe Api::JobsController, type: :controller do
         )
         expect(body['data'].first).not_to have_key('sponsorship_level')
       end
+
+      context 'more than 25 jobs available' do
+        before do
+          12.times { create(:job, sponsorship_level: 1) }
+          13.times { create(:job, sponsorship_level: 2) }
+        end
+
+        it 'renders the first 25 jobs, ordered by sponsorship level descending' do
+          get :index
+
+          body = JSON.parse(response.body)
+          expect(body['data'].length).to eq(25)
+
+          job_ids = body['data'].map { |d| d['id'] }
+          results_sponsorship_levels = Job.find(job_ids).pluck(:sponsorship_level).uniq
+          expect(results_sponsorship_levels).to include('emerald', 'sapphire')
+          expect(results_sponsorship_levels).not_to include('opal')
+        end
+
+        context 'page param provided' do
+          it 'renders the last 3 jobs, ordered by sponsorship level descending' do
+            get :index, params: { page: '2' }
+
+            body = JSON.parse(response.body)
+            expect(body['data'].length).to eq(3)
+
+            job_ids = body['data'].map { |d| d['id'] }
+            results_sponsorship_levels = Job.find(job_ids).pluck(:sponsorship_level).uniq
+            expect(results_sponsorship_levels).to include('opal')
+            expect(results_sponsorship_levels).not_to include('emerald', 'sapphire')
+          end
+        end
+      end
     end
   end
 

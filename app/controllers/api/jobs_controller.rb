@@ -2,13 +2,18 @@
 
 module Api
   class JobsController < ApplicationController
+    include Pagy::Backend
+
     skip_before_action :verify_authenticity_token, only: [:authenticate]
+
+    PAGE_LIMT = 25
 
     def index
       JWT.decode bearer_token, hmac_secret, true, { algorithm: 'HS256' }
 
-      jobs = Job.all
-      render status: 200, json: { data: jobs.order(sponsorship_level: :desc).as_json }
+      pagy, jobs = pagy(Job.all.order(sponsorship_level: :desc), items: PAGE_LIMT)
+      render status: 200, json: { data: jobs.as_json,
+                                  pagy: pagy_metadata(pagy) }
     rescue JWT::ExpiredSignature, JWT::DecodeError
       render status: 401, json: {}
     end
